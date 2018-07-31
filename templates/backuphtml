@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>ChatBot</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" media="screen" href="../static/style.css" />
+    <!-- <script src="main.js"></script> -->
+</head>
+
+<body>
+    <div class="chatbox">
+        <!-- <div class="chatlogs"> -->
+            <div class="panel-body fixed-panel">
+                <ul class="media-list">
+                </ul>
+            </div>
+        <div class="chat-form">
+            <form method="POST" id="chatbot-form">
+                <input type="text" class="form-control" placeholder="Enter Message" name="messageText" id="messageText" autofocus/>
+                <button id="chatbot-form-btn">Send</button>
+            </form>
+
+        </div>
+    </div>
+    <script src="http://code.jquery.com/jquery-1.12.4.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <script>
+        $(function () {
+            $('#chatbot-form-btn').click(function (e) {
+                e.preventDefault();
+                $('#chatbot-form').submit();
+            });
+            $('#chatbot-form-btn-clear').click(function (e) {
+                e.preventDefault();
+                $('#chatPanel').find('.media-list').html('');
+            });
+            $('#chatbot-form').submit(function (e) {
+                e.preventDefault();
+                var message = $('#messageText').val();
+                $(".media-list").append('<div class="chat user"><div class="user-photo"></div><p class="chat-message">'+message+'</p></div>');
+
+                $.ajax({
+                    type: "POST",
+                    url: "http://localhost:8000/ask",
+                    data: $(this).serialize(),
+                    success: function (response) {
+                        $('#messageText').val('');
+                        var answer = response.answer;
+                        const chatPanel = document.getElementById("chatPanel");
+                        $(".media-list").append('<div class="chat bot"><div class="user-photo"></div><p class="chat-message">'+answer+'</p></div>');
+                        $(".fixed-panel").stop().animate({ scrollTop: $(".fixed-panel")[0].scrollHeight }, 1000);
+                    },
+                    error: function (error) {
+                        console.log(error);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>
